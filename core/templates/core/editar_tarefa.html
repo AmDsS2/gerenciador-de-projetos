@@ -1,0 +1,89 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Editar Tarefa - {{ tarefa.titulo }} - TeamFlow{% endblock %}
+
+{% block page_title %}Editar Tarefa{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto">
+    <div class="bg-white shadow rounded-lg p-6">
+        <form method="post">
+            {% csrf_token %}
+            
+            <!-- Título -->
+            <div class="mb-4">
+                <label for="titulo" class="block text-sm font-medium text-gray-700">Título</label>
+                <input type="text" name="titulo" id="titulo" value="{{ tarefa.titulo }}" required
+                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+            </div>
+
+            <!-- Descrição -->
+            <div class="mb-4">
+                <label for="descricao" class="block text-sm font-medium text-gray-700">Descrição</label>
+                <textarea name="descricao" id="descricao" rows="4" required
+                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">{{ tarefa.descricao }}</textarea>
+            </div>
+
+            <!-- Status -->
+            <div class="mb-4">
+                <label for="status" class="block text-sm font-medium text-gray-700">Status</label>
+                <select name="status" id="status" required
+                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+                    <option value="pendente" {% if tarefa.status == 'pendente' %}selected{% endif %}>Pendente</option>
+                    <option value="em_andamento" {% if tarefa.status == 'em_andamento' %}selected{% endif %}>Em Andamento</option>
+                    <option value="concluida" {% if tarefa.status == 'concluida' %}selected{% endif %}>Concluída</option>
+                </select>
+            </div>
+
+            <!-- Prioridade -->
+            <div class="mb-4">
+                <label for="prioridade" class="block text-sm font-medium text-gray-700">Prioridade</label>
+                <select name="prioridade" id="prioridade" required
+                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+                    <option value="baixa" {% if tarefa.prioridade == 'baixa' %}selected{% endif %}>Baixa</option>
+                    <option value="media" {% if tarefa.prioridade == 'media' %}selected{% endif %}>Média</option>
+                    <option value="alta" {% if tarefa.prioridade == 'alta' %}selected{% endif %}>Alta</option>
+                </select>
+            </div>
+
+            <!-- Data de Início -->
+            <div class="mb-4">
+                <label for="data_inicio" class="block text-sm font-medium text-gray-700">Data de Início</label>
+                <input type="date" name="data_inicio" id="data_inicio" value="{{ tarefa.data_inicio|date:'Y-m-d' }}"
+                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+            </div>
+
+            <!-- Data Prevista -->
+            <div class="mb-4">
+                <label for="data_prevista" class="block text-sm font-medium text-gray-700">Data Prevista</label>
+                <input type="date" name="data_prevista" id="data_prevista" value="{{ tarefa.data_prevista|date:'Y-m-d' }}"
+                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+            </div>
+
+            <!-- Responsável -->
+            <div class="mb-4">
+                <label for="responsavel" class="block text-sm font-medium text-gray-700">Responsável</label>
+                <select name="responsavel" id="responsavel" required
+                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+                    <option value="">Selecione um responsável</option>
+                    {% for user in usuarios %}
+                        <option value="{{ user.id }}" {% if user.id == tarefa.responsavel.id %}selected{% endif %}>
+                            {{ user.get_full_name|default:user.username }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- Botões -->
+            <div class="mt-6 flex justify-end space-x-4">
+                <a href="{% url 'kanban' tarefa.projeto.id %}" class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                    Cancelar
+                </a>
+                <button type="submit" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                    Salvar Alterações
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %} 

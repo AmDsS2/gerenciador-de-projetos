@@ -1,0 +1,216 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Kanban - {{ projeto.titulo }} - TeamFlow{% endblock %}
+
+{% block page_title %}Kanban - {{ projeto.titulo }}{% endblock %}
+
+{% block content %}
+{% csrf_token %}
+<div class="mb-4 flex justify-between items-center">
+    <div>
+        <h2 class="text-2xl font-bold text-gray-800">Kanban</h2>
+        <p class="text-sm text-gray-500 mt-1">Arraste e solte as tarefas para atualizar o status</p>
+    </div>
+    <div class="flex space-x-3">
+        <a href="{% url 'detalhe_projeto' projeto.id %}" class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+            <i class="fas fa-arrow-left mr-2"></i>
+            Voltar ao Projeto
+        </a>
+        <a href="{% url 'editar_projeto' projeto.id %}" class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+            <i class="fas fa-edit mr-2"></i>
+            Editar Projeto
+        </a>
+        <a href="{% url 'criar_tarefa' projeto.id %}" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+            <i class="fas fa-plus mr-2"></i>
+            Nova Tarefa
+        </a>
+    </div>
+</div>
+
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <!-- Coluna Pendente -->
+    <div class="bg-gray-50 rounded-lg p-4">
+        <div class="flex justify-between items-center mb-4">
+            <h3 class="text-lg font-semibold text-gray-700">Pendente</h3>
+            <span class="bg-gray-200 text-gray-700 text-xs px-2 py-1 rounded-full">{{ tarefas_pendentes|length }}</span>
+        </div>
+        <div class="space-y-4 min-h-[400px]" id="pendente" ondrop="drop(event)" ondragover="allowDrop(event)">
+            {% for tarefa in tarefas_pendentes %}
+            <div class="bg-white p-4 rounded-lg shadow-sm cursor-move hover:shadow-md transition-shadow duration-200" draggable="true" ondragstart="drag(event)" id="tarefa-{{ tarefa.id }}">
+                <div class="flex justify-between items-start">
+                    <h4 class="font-medium text-gray-800">{{ tarefa.titulo }}</h4>
+                    <div class="flex space-x-2">
+                        <a href="{% url 'editar_tarefa' tarefa.id %}" class="text-gray-400 hover:text-indigo-600">
+                            <i class="fas fa-pencil-alt"></i>
+                        </a>
+                        <a href="{% url 'excluir_tarefa' tarefa.id %}" class="text-red-400 hover:text-red-500">
+                            <i class="fas fa-trash-alt"></i>
+                        </a>
+                    </div>
+                </div>
+                <p class="text-sm text-gray-600 mt-1">{{ tarefa.descricao|truncatechars:100 }}</p>
+                <div class="mt-3 flex items-center justify-between">
+                    <span class="px-2 py-1 text-xs font-medium rounded-full 
+                        {% if tarefa.prioridade == 'alta' %}bg-red-100 text-red-800
+                        {% elif tarefa.prioridade == 'media' %}bg-yellow-100 text-yellow-800
+                        {% else %}bg-green-100 text-green-800{% endif %}">
+                        {{ tarefa.get_prioridade_display }}
+                    </span>
+                    <span class="text-xs text-gray-500">
+                        <i class="far fa-calendar-alt mr-1"></i>
+                        {{ tarefa.data_prevista|date:"d/m/Y"|default:"Sem prazo" }}
+                    </span>
+                </div>
+                {% if tarefa.responsavel %}
+                <div class="mt-3 flex items-center">
+                    <img class="w-6 h-6 rounded-full" src="https://www.gravatar.com/avatar/{{ tarefa.responsavel.email|default:'default' }}?d=mp" alt="Responsável">
+                    <span class="ml-2 text-xs text-gray-600">{{ tarefa.responsavel.get_full_name|default:tarefa.responsavel.username }}</span>
+                </div>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Coluna Em Andamento -->
+    <div class="bg-gray-50 rounded-lg p-4">
+        <div class="flex justify-between items-center mb-4">
+            <h3 class="text-lg font-semibold text-gray-700">Em Andamento</h3>
+            <span class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full">{{ tarefas_em_andamento|length }}</span>
+        </div>
+        <div class="space-y-4 min-h-[400px]" id="em_andamento" ondrop="drop(event)" ondragover="allowDrop(event)">
+            {% for tarefa in tarefas_em_andamento %}
+            <div class="bg-white p-4 rounded-lg shadow-sm cursor-move hover:shadow-md transition-shadow duration-200" draggable="true" ondragstart="drag(event)" id="tarefa-{{ tarefa.id }}">
+                <div class="flex justify-between items-start">
+                    <h4 class="font-medium text-gray-800">{{ tarefa.titulo }}</h4>
+                    <div class="flex space-x-2">
+                        <a href="{% url 'editar_tarefa' tarefa.id %}" class="text-gray-400 hover:text-indigo-600">
+                            <i class="fas fa-pencil-alt"></i>
+                        </a>
+                        <a href="{% url 'excluir_tarefa' tarefa.id %}" class="text-red-400 hover:text-red-500">
+                            <i class="fas fa-trash-alt"></i>
+                        </a>
+                    </div>
+                </div>
+                <p class="text-sm text-gray-600 mt-1">{{ tarefa.descricao|truncatechars:100 }}</p>
+                <div class="mt-3 flex items-center justify-between">
+                    <span class="px-2 py-1 text-xs font-medium rounded-full 
+                        {% if tarefa.prioridade == 'alta' %}bg-red-100 text-red-800
+                        {% elif tarefa.prioridade == 'media' %}bg-yellow-100 text-yellow-800
+                        {% else %}bg-green-100 text-green-800{% endif %}">
+                        {{ tarefa.get_prioridade_display }}
+                    </span>
+                    <span class="text-xs text-gray-500">
+                        <i class="far fa-calendar-alt mr-1"></i>
+                        {{ tarefa.data_prevista|date:"d/m/Y"|default:"Sem prazo" }}
+                    </span>
+                </div>
+                {% if tarefa.responsavel %}
+                <div class="mt-3 flex items-center">
+                    <img class="w-6 h-6 rounded-full" src="https://www.gravatar.com/avatar/{{ tarefa.responsavel.email|default:'default' }}?d=mp" alt="Responsável">
+                    <span class="ml-2 text-xs text-gray-600">{{ tarefa.responsavel.get_full_name|default:tarefa.responsavel.username }}</span>
+                </div>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Coluna Concluída -->
+    <div class="bg-gray-50 rounded-lg p-4">
+        <div class="flex justify-between items-center mb-4">
+            <h3 class="text-lg font-semibold text-gray-700">Concluída</h3>
+            <span class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">{{ tarefas_concluidas|length }}</span>
+        </div>
+        <div class="space-y-4 min-h-[400px]" id="concluida" ondrop="drop(event)" ondragover="allowDrop(event)">
+            {% for tarefa in tarefas_concluidas %}
+            <div class="bg-white p-4 rounded-lg shadow-sm cursor-move hover:shadow-md transition-shadow duration-200" draggable="true" ondragstart="drag(event)" id="tarefa-{{ tarefa.id }}">
+                <div class="flex justify-between items-start">
+                    <h4 class="font-medium text-gray-800">{{ tarefa.titulo }}</h4>
+                    <div class="flex space-x-2">
+                        <a href="{% url 'editar_tarefa' tarefa.id %}" class="text-gray-400 hover:text-indigo-600">
+                            <i class="fas fa-pencil-alt"></i>
+                        </a>
+                        <a href="{% url 'excluir_tarefa' tarefa.id %}" class="text-red-400 hover:text-red-500">
+                            <i class="fas fa-trash-alt"></i>
+                        </a>
+                    </div>
+                </div>
+                <p class="text-sm text-gray-600 mt-1">{{ tarefa.descricao|truncatechars:100 }}</p>
+                <div class="mt-3 flex items-center justify-between">
+                    <span class="px-2 py-1 text-xs font-medium rounded-full 
+                        {% if tarefa.prioridade == 'alta' %}bg-red-100 text-red-800
+                        {% elif tarefa.prioridade == 'media' %}bg-yellow-100 text-yellow-800
+                        {% else %}bg-green-100 text-green-800{% endif %}">
+                        {{ tarefa.get_prioridade_display }}
+                    </span>
+                    <span class="text-xs text-gray-500">
+                        <i class="far fa-calendar-alt mr-1"></i>
+                        {{ tarefa.data_prevista|date:"d/m/Y"|default:"Sem prazo" }}
+                    </span>
+                </div>
+                {% if tarefa.responsavel %}
+                <div class="mt-3 flex items-center">
+                    <img class="w-6 h-6 rounded-full" src="https://www.gravatar.com/avatar/{{ tarefa.responsavel.email|default:'default' }}?d=mp" alt="Responsável">
+                    <span class="ml-2 text-xs text-gray-600">{{ tarefa.responsavel.get_full_name|default:tarefa.responsavel.username }}</span>
+                </div>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+function allowDrop(ev) {
+    ev.preventDefault();
+}
+
+function drag(ev) {
+    ev.dataTransfer.setData("text", ev.target.id);
+}
+
+function drop(ev) {
+    ev.preventDefault();
+    const tarefaId = ev.dataTransfer.getData("text").split('-')[1];
+    const novoStatus = ev.target.id;
+    
+    // Enviar requisição para atualizar o status
+    fetch(`/tarefas/${tarefaId}/atualizar-status/`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+        },
+        body: JSON.stringify({
+            status: novoStatus
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Mover o elemento para a nova coluna
+            const tarefaElement = document.getElementById(`tarefa-${tarefaId}`);
+            ev.target.appendChild(tarefaElement);
+            
+            // Atualizar contadores
+            const colunas = ['pendente', 'em_andamento', 'concluida'];
+            colunas.forEach(coluna => {
+                const contador = document.querySelector(`#${coluna} + .flex span`);
+                if (contador) {
+                    contador.textContent = document.querySelector(`#${coluna}`).children.length;
+                }
+            });
+        } else {
+            alert('Erro ao atualizar o status da tarefa');
+        }
+    })
+    .catch(error => {
+        console.error('Erro:', error);
+        alert('Erro ao atualizar o status da tarefa');
+    });
+}
+</script>
+{% endblock %}
+{% endblock %} 

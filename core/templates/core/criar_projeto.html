@@ -1,0 +1,124 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Novo Projeto - TeamFlow{% endblock %}
+
+{% block page_title %}Novo Projeto{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto">
+    <div class="bg-white shadow rounded-lg p-6">
+        <h2 class="text-lg font-medium text-gray-900 mb-6">Preencha as informações abaixo para criar um novo projeto.</h2>
+        
+        <form method="post" class="space-y-6">
+            {% csrf_token %}
+            
+            <!-- Nome do Projeto -->
+            <div>
+                <label for="titulo" class="block text-sm font-medium text-gray-700">Nome do Projeto *</label>
+                <div class="mt-1">
+                    <input type="text" name="titulo" id="titulo" required
+                        class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                        placeholder="Nome do projeto">
+                </div>
+            </div>
+
+            <!-- Descrição -->
+            <div>
+                <label for="descricao" class="block text-sm font-medium text-gray-700">Descrição</label>
+                <div class="mt-1">
+                    <textarea name="descricao" id="descricao" rows="4"
+                        class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                        placeholder="Descrição detalhada do projeto"></textarea>
+                </div>
+            </div>
+
+            <!-- Status -->
+            <div>
+                <label for="status" class="block text-sm font-medium text-gray-700">Status *</label>
+                <div class="mt-1">
+                    <select name="status" id="status" required
+                        class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md">
+                        <option value="em_andamento" selected>Em andamento</option>
+                        <option value="pendente">Pendente</option>
+                        <option value="concluido">Concluído</option>
+                        <option value="cancelado">Cancelado</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Município -->
+            <div>
+                <label for="municipio" class="block text-sm font-medium text-gray-700">Município</label>
+                <div class="mt-1">
+                    <input type="text" name="municipio" id="municipio"
+                        class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                        placeholder="Nome do município">
+                </div>
+            </div>
+
+            <!-- Data de Início -->
+            <div>
+                <label for="data_inicio" class="block text-sm font-medium text-gray-700">Data de Início</label>
+                <div class="mt-1">
+                    <input type="date" name="data_inicio" id="data_inicio"
+                        class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                        placeholder="Selecione uma data">
+                </div>
+            </div>
+
+            <!-- Data de Término -->
+            <div>
+                <label for="data_prevista" class="block text-sm font-medium text-gray-700">Data de Término</label>
+                <div class="mt-1">
+                    <input type="date" name="data_prevista" id="data_prevista"
+                        class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                        placeholder="Selecione uma data">
+                </div>
+            </div>
+
+            <!-- Responsável -->
+            <div>
+                <label for="responsavel" class="block text-sm font-medium text-gray-700">Responsável</label>
+                <div class="mt-1">
+                    <select name="responsavel" id="responsavel"
+                        class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md">
+                        <option value="">Selecione um responsável</option>
+                        {% for user in usuarios %}
+                            <option value="{{ user.id }}" {% if user.id == request.user.id %}selected{% endif %}>
+                                {{ user.get_full_name|default:user.username }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+
+            <!-- SLA -->
+            <div>
+                <label for="sla" class="block text-sm font-medium text-gray-700">SLA (Prazo de resposta)</label>
+                <div class="mt-1">
+                    <select name="sla" id="sla"
+                        class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md">
+                        <option value="">Selecione um SLA</option>
+                        <option value="24h">24 horas</option>
+                        <option value="48h">48 horas</option>
+                        <option value="72h">72 horas</option>
+                        <option value="5d">5 dias</option>
+                        <option value="10d">10 dias</option>
+                        <option value="15d">15 dias</option>
+                        <option value="30d">30 dias</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="flex justify-end space-x-4">
+                <a href="{% url 'lista_projetos' %}" class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                    Cancelar
+                </a>
+                <button type="submit" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                    Criar Projeto
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %} 

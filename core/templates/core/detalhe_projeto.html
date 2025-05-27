@@ -1,0 +1,148 @@
+{% extends 'core/base.html' %}
+
+{% block title %}{{ projeto.titulo }} - TeamFlow{% endblock %}
+
+{% block page_title %}{{ projeto.titulo }}{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto">
+    <!-- Cabeçalho do Projeto -->
+    <div class="bg-white shadow rounded-lg p-6 mb-6">
+        <div class="flex justify-between items-start">
+            <div>
+                <h2 class="text-2xl font-bold text-gray-900">{{ projeto.titulo }}</h2>
+                <p class="mt-2 text-gray-600">{{ projeto.descricao }}</p>
+            </div>
+            <div class="flex space-x-3">
+                <a href="{% url 'editar_projeto' projeto.id %}" class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                    <i class="fas fa-edit mr-2"></i>
+                    Editar Projeto
+                </a>
+                <a href="{% url 'kanban' projeto.id %}" class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                    <i class="fas fa-columns mr-2"></i>
+                    Kanban
+                </a>
+                <a href="{% url 'criar_tarefa' projeto.id %}" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                    <i class="fas fa-plus mr-2"></i>
+                    Nova Tarefa
+                </a>
+                <a href="{% url 'excluir_projeto' projeto.id %}" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
+                    <i class="fas fa-trash-alt mr-2"></i>
+                    Excluir Projeto
+                </a>
+            </div>
+        </div>
+
+        <!-- Informações do Projeto -->
+        <div class="mt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Status -->
+            <div class="bg-gray-50 rounded-lg p-4">
+                <h3 class="text-sm font-medium text-gray-500">Status</h3>
+                <p class="mt-1 text-lg font-semibold text-gray-900">
+                    {% if projeto.status == 'em_andamento' %}
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                            Em andamento
+                        </span>
+                    {% elif projeto.status == 'pendente' %}
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                            Pendente
+                        </span>
+                    {% elif projeto.status == 'concluido' %}
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                            Concluído
+                        </span>
+                    {% else %}
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                            Cancelado
+                        </span>
+                    {% endif %}
+                </p>
+            </div>
+
+            <!-- Município -->
+            <div class="bg-gray-50 rounded-lg p-4">
+                <h3 class="text-sm font-medium text-gray-500">Município</h3>
+                <p class="mt-1 text-lg font-semibold text-gray-900">{{ projeto.municipio|default:"Não especificado" }}</p>
+            </div>
+
+            <!-- SLA -->
+            <div class="bg-gray-50 rounded-lg p-4">
+                <h3 class="text-sm font-medium text-gray-500">SLA</h3>
+                <p class="mt-1 text-lg font-semibold text-gray-900">{{ projeto.get_sla_display|default:"Não especificado" }}</p>
+            </div>
+
+            <!-- Data de Início -->
+            <div class="bg-gray-50 rounded-lg p-4">
+                <h3 class="text-sm font-medium text-gray-500">Data de Início</h3>
+                <p class="mt-1 text-lg font-semibold text-gray-900">{{ projeto.data_inicio|date:"d/m/Y"|default:"Não especificada" }}</p>
+            </div>
+
+            <!-- Data de Término -->
+            <div class="bg-gray-50 rounded-lg p-4">
+                <h3 class="text-sm font-medium text-gray-500">Data de Término</h3>
+                <p class="mt-1 text-lg font-semibold text-gray-900">{{ projeto.data_prevista|date:"d/m/Y"|default:"Não especificada" }}</p>
+            </div>
+
+            <!-- Responsável -->
+            <div class="bg-gray-50 rounded-lg p-4">
+                <h3 class="text-sm font-medium text-gray-500">Responsável</h3>
+                <p class="mt-1 text-lg font-semibold text-gray-900">{{ projeto.responsavel.get_full_name|default:projeto.responsavel.username|default:"Não especificado" }}</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lista de Tarefas -->
+    <div class="bg-white shadow rounded-lg">
+        <div class="px-6 py-4 border-b border-gray-200">
+            <h3 class="text-lg font-medium text-gray-900">Tarefas</h3>
+        </div>
+        <div class="divide-y divide-gray-200">
+            {% for tarefa in projeto.tarefas.all %}
+            <div class="px-6 py-4">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0">
+                            {% if tarefa.status == 'concluida' %}
+                            <svg class="h-6 w-6 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                            </svg>
+                            {% else %}
+                            <svg class="h-6 w-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            {% endif %}
+                        </div>
+                        <div class="ml-4">
+                            <h4 class="text-lg font-medium text-gray-900">{{ tarefa.titulo }}</h4>
+                            <p class="mt-1 text-sm text-gray-500">{{ tarefa.descricao }}</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+                            {% if tarefa.prioridade == 'alta' %}
+                                bg-red-100 text-red-800
+                            {% elif tarefa.prioridade == 'media' %}
+                                bg-yellow-100 text-yellow-800
+                            {% else %}
+                                bg-green-100 text-green-800
+                            {% endif %}">
+                            {{ tarefa.get_prioridade_display }}
+                        </span>
+                        <span class="text-sm text-gray-500">
+                            Prazo: {{ tarefa.data_prevista|date:"d/m/Y"|default:"Sem prazo" }}
+                        </span>
+                        <a href="{% url 'editar_tarefa' tarefa.id %}" class="text-indigo-600 hover:text-indigo-900">
+                            <i class="fas fa-edit"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="px-6 py-4 text-center text-gray-500">
+                Nenhuma tarefa cadastrada.
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %} 
