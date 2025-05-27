@@ -4,7 +4,6 @@ __pycache__/
 *$py.class
 *.so
 .Python
-env/
 build/
 develop-eggs/
 dist/
@@ -16,6 +15,7 @@ lib64/
 parts/
 sdist/
 var/
+wheels/
 *.egg-info/
 .installed.cfg
 *.egg
@@ -25,26 +25,27 @@ var/
 local_settings.py
 db.sqlite3
 db.sqlite3-journal
-media
+media/
 
-# Ambiente virtual
+# Virtual Environment
 venv/
+env/
 ENV/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
 
 # Arquivos de ambiente
 .env
 .env.local
 .env.*.local
-
-# Arquivos do sistema
-.DS_Store
-Thumbs.db
-
-# Arquivos de IDE
-.idea/
-.vscode/
-*.swp
-*.swo
 
 # Arquivos estáticos coletados
 staticfiles/ 
