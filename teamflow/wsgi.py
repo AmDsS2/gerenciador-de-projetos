@@ -8,8 +8,14 @@ https://docs.djangoproject.com/en/5.2/howto/deployment/wsgi/
 """
 
 import os
+import sys
 from django.core.wsgi import get_wsgi_application
 from dotenv import load_dotenv
+
+# Adiciona o diretório do projeto ao Python path
+path = '/home/aryanmartins/gerenciador-de-projetos'
+if path not in sys.path:
+    sys.path.append(path)
 
 load_dotenv()
 
