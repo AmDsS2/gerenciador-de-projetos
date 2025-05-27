@@ -85,7 +85,7 @@ DATABASES = {
         'NAME': BASE_DIR / 'db.sqlite3',
     } if DEBUG else {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'aryanmartins$gerenciador',
+        'NAME': 'aryanmartins$default',
         'USER': 'aryanmartins',
         'PASSWORD': os.getenv('DB_PASSWORD', ''),
         'HOST': 'aryanmartins.mysql.pythonanywhere-services.com',
