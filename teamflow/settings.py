@@ -81,9 +81,6 @@ WSGI_APPLICATION = 'teamflow.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    } if DEBUG else {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'aryanmartins$default',
         'USER': 'aryanmartins',

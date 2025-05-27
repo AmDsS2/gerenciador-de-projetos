@@ -13,7 +13,7 @@ from django.core.wsgi import get_wsgi_application
 from dotenv import load_dotenv
 
 # Adiciona o diretório do projeto ao Python path
-path = '/home/aryanmartins/gerenciador-de-projetos'
+path = '/home/aryanmartins/gerenciamentodeprojeto'
 if path not in sys.path:
     sys.path.append(path)
 
